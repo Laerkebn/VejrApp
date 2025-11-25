@@ -137,22 +137,41 @@ function updateBackgroundByTime() {
     const now = new Date();
     const hour = now.getHours() + now.getMinutes() / 60;
 
-    // Definer dag- og natfarver
-    const dayColor = [135, 206, 235];   // Lys blå (#87CEEB)
-    const nightColor = [10, 20, 40];    // Mørk blå
+    // Definer farver for forskellige tidspunkter på døgnet
+    const timeColors = [
+        { hour: 0, color: [10, 20, 40] },      // Midnat - mørk blå
+        { hour: 5, color: [25, 35, 60] },      // Tidlig morgen - dyb blå
+        { hour: 6, color: [255, 140, 100] },   // Solopgang - orange/rød
+        { hour: 7, color: [255, 180, 140] },   // Tidlig morgen - lys orange
+        { hour: 8, color: [160, 210, 240] },   // Morgenhimmel - lys blå
+        { hour: 12, color: [135, 206, 235] },  // Middag - klar blå
+        { hour: 16, color: [140, 200, 230] },  // Eftermiddag - blå
+        { hour: 18, color: [255, 150, 100] },  // Solnedgang - orange
+        { hour: 19, color: [200, 100, 80] },   // Sen solnedgang - dyb orange
+        { hour: 20, color: [80, 60, 100] },    // Skumring - lilla
+        { hour: 21, color: [40, 40, 70] },     // Aften - mørk blå
+        { hour: 24, color: [10, 20, 40] }      // Midnat - mørk blå
+    ];
 
-    // Beregn hvor langt vi er i døgnet (0 = midnat, 12 = middag)
-    let t;
-    if (hour < 6) t = 0;                // nat → nat
-    else if (hour < 8) t = (hour - 6) / 2; // solopgang
-    else if (hour < 18) t = 1;          // dag
-    else if (hour < 20) t = 1 - (hour - 18) / 2; // solnedgang
-    else t = 0;                         // nat
+    // Find de to nærmeste tidspunkter
+    let before = timeColors[0];
+    let after = timeColors[timeColors.length - 1];
+    
+    for (let i = 0; i < timeColors.length - 1; i++) {
+        if (hour >= timeColors[i].hour && hour <= timeColors[i + 1].hour) {
+            before = timeColors[i];
+            after = timeColors[i + 1];
+            break;
+        }
+    }
+
+    // Beregn hvor langt vi er mellem de to tidspunkter (0-1)
+    const progress = (hour - before.hour) / (after.hour - before.hour);
 
     // Interpoler mellem farverne
-    const r = Math.round(nightColor[0] * (1 - t) + dayColor[0] * t);
-    const g = Math.round(nightColor[1] * (1 - t) + dayColor[1] * t);
-    const b = Math.round(nightColor[2] * (1 - t) + dayColor[2] * t);
+    const r = Math.round(before.color[0] * (1 - progress) + after.color[0] * progress);
+    const g = Math.round(before.color[1] * (1 - progress) + after.color[1] * progress);
+    const b = Math.round(before.color[2] * (1 - progress) + after.color[2] * progress);
 
     // Opdater CSS-variablen
     document.documentElement.style.setProperty('--bg-color', `rgb(${r}, ${g}, ${b})`);
@@ -160,8 +179,8 @@ function updateBackgroundByTime() {
 
 // Kør ved load
 updateBackgroundByTime();
-// Kør igen hvert 5. minut
-setInterval(updateBackgroundByTime, 5 * 60 * 1000);
+// Opdater hvert minut for jævn overgang
+setInterval(updateBackgroundByTime, 60 * 1000);
 </script>
 
 

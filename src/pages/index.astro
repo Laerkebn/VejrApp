@@ -2,15 +2,6 @@
 import '../styles/global.css';
 ---
 
-<!DOCTYPE html>
-<html lang="da">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vejr Animation</title>
-  
-</head>
-<body>
   <div class="weather-container">
     <!-- Sol -->
     <svg class="weather-layer" id="sol" viewBox="0 0 469.32 307.41" xmlns="http://www.w3.org/2000/svg">
@@ -140,6 +131,39 @@ import '../styles/global.css';
     });
   });
 </script>
+
+<script>
+function updateBackgroundByTime() {
+    const now = new Date();
+    const hour = now.getHours() + now.getMinutes() / 60;
+
+    // Definer dag- og natfarver
+    const dayColor = [135, 206, 235];   // Lys blå (#87CEEB)
+    const nightColor = [10, 20, 40];    // Mørk blå
+
+    // Beregn hvor langt vi er i døgnet (0 = midnat, 12 = middag)
+    let t;
+    if (hour < 6) t = 0;                // nat → nat
+    else if (hour < 8) t = (hour - 6) / 2; // solopgang
+    else if (hour < 18) t = 1;          // dag
+    else if (hour < 20) t = 1 - (hour - 18) / 2; // solnedgang
+    else t = 0;                         // nat
+
+    // Interpoler mellem farverne
+    const r = Math.round(nightColor[0] * (1 - t) + dayColor[0] * t);
+    const g = Math.round(nightColor[1] * (1 - t) + dayColor[1] * t);
+    const b = Math.round(nightColor[2] * (1 - t) + dayColor[2] * t);
+
+    // Opdater CSS-variablen
+    document.documentElement.style.setProperty('--bg-color', `rgb(${r}, ${g}, ${b})`);
+}
+
+// Kør ved load
+updateBackgroundByTime();
+// Kør igen hvert 5. minut
+setInterval(updateBackgroundByTime, 5 * 60 * 1000);
+</script>
+
 
 </body>
 </html>

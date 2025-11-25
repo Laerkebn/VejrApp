@@ -24,7 +24,17 @@ margin: 0;
   width: 100%;
   max-width: 600px;
   aspect-ratio: 469.32 / 307.41;
-  background: #98c9d4;
+  background: var(--bg-color);
+  transition: background 1s ease;
+}
+
+:root {
+  --bg-color: #87CEEB; /* fallback */
+}
+
+.time-background {
+  background: var(--bg-color);
+  transition: background 1s ease;
 }
 
 .weather-layer {

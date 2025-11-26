@@ -4,15 +4,12 @@ import Svg from "./svg.astro";
 ---
 
 
-
 <html lang="da">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vejr App</title>
   </head>
-
-
 
   <body class="font-philosopher m-0 p-5 bg-gray-200 flex flex-col items-center">
    
@@ -87,7 +84,7 @@ import Svg from "./svg.astro";
 
       // Vejr API funktion
       async function getWeather(city) {
-        const API_KEY = "ea4457bca726d0664234f97788706bf3"; // <--- INDSÆT DIN API-NØGLE HER!
+        const API_KEY = "ea4457bca726d0664234f97788706bf3";
         const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=da&appid=${API_KEY}`;
 
         try {
@@ -104,12 +101,12 @@ import Svg from "./svg.astro";
 
       function updateWeatherUI(data) {
         const condition = data.weather[0].main.toLowerCase();
+        const description = data.weather[0].description.toLowerCase();
         const temp = Math.round(data.main.temp);
-        const description = data.weather[0].description;
 
         document.getElementById("weatherInfo").innerHTML =
           `<h3 class="text-2xl text-[#4e93a6] font-bold">${data.name} – ${temp}°C</h3>
-           <p class="text-gray-600 mt-1">${description}</p>`;
+           <p class="text-gray-600 mt-1">${data.weather[0].description}</p>`;
 
         // Skjul alle vejr-lag først
         document.querySelectorAll(".weather-layer").forEach((el) => {
@@ -117,27 +114,32 @@ import Svg from "./svg.astro";
         });
 
         // Vis relevante lag baseret på vejrforhold
-        if (condition.includes("clear")) {
-          document.getElementById("sol")?.classList.add("visible");
+        // VIGTIGT: Tjek "clear" FØRST, før "cloud"
+        if (condition === "clear") {
+          document.getElementById("Højsol")?.classList.add("visible");
         }
-
-        if (condition.includes("cloud")) {
+        else if (description.includes("few clouds")) {
+          // Lette skyer
+          document.getElementById("solbagsky")?.classList.add("visible");
           document.getElementById("lillessky")?.classList.add("visible");
-          document.getElementById("graasky")?.classList.add("visible");
         }
-
-        if (condition.includes("rain") || condition.includes("drizzle")) {
-          document.getElementById("graasky")?.classList.add("visible");
-          document.getElementById("storskygge")?.classList.add("visible");
-          document.getElementById("layer-regn")?.classList.add("visible");
-        }
-
-        if (condition.includes("snow")) {
+        else if (condition === "clouds") {
+          // Skyet
           document.getElementById("hvidsky")?.classList.add("visible");
-          document.getElementById("layer-sne")?.classList.add("visible");
+          document.getElementById("graasky")?.classList.add("visible");
         }
 
-        if (condition.includes("thunder")) {
+        if (condition === "rain" || condition === "drizzle") {
+          document.getElementById("storskygge")?.classList.add("visible");
+          document.getElementById("regn")?.classList.add("visible");
+        }
+
+        if (condition === "snow") {
+          document.getElementById("hvidsky")?.classList.add("visible");
+          document.getElementById("sne")?.classList.add("visible");
+        }
+
+        if (condition === "thunderstorm") {
           document.getElementById("graasky")?.classList.add("visible");
           document.getElementById("storskygge")?.classList.add("visible");
           document.getElementById("lyn")?.classList.add("visible");
@@ -172,6 +174,7 @@ import Svg from "./svg.astro";
       // Start med København som standardby
       getWeather("Copenhagen");
     </script>
+
     <style>
       .weather-layer {
         position: absolute;

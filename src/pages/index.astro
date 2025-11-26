@@ -108,38 +108,43 @@ import Svg from "./svg.astro";
           `<h3 class="text-2xl text-[#4e93a6] font-bold">${data.name} – ${temp}°C</h3>
            <p class="text-gray-600 mt-1">${data.weather[0].description}</p>`;
 
+        console.log("Condition:", condition, "Description:", description);
+
         // Skjul alle vejr-lag først
         document.querySelectorAll(".weather-layer").forEach((el) => {
           el.classList.remove("visible");
         });
 
         // Vis relevante lag baseret på vejrforhold
-        // VIGTIGT: Tjek "clear" FØRST, før "cloud"
         if (condition === "clear") {
+          console.log("Viser sol");
           document.getElementById("Højsol")?.classList.add("visible");
         }
-        else if (description.includes("few clouds")) {
-          // Lette skyer
+        else if (description === "few clouds" || description === "få skyer") {
+          console.log("Viser lette skyer");
           document.getElementById("solbagsky")?.classList.add("visible");
           document.getElementById("lillessky")?.classList.add("visible");
         }
         else if (condition === "clouds") {
-          // Skyet
+          console.log("Viser skyer");
           document.getElementById("hvidsky")?.classList.add("visible");
           document.getElementById("graasky")?.classList.add("visible");
         }
 
         if (condition === "rain" || condition === "drizzle") {
+          console.log("Viser regn");
           document.getElementById("storskygge")?.classList.add("visible");
           document.getElementById("regn")?.classList.add("visible");
         }
 
         if (condition === "snow") {
+          console.log("Viser sne");
           document.getElementById("hvidsky")?.classList.add("visible");
           document.getElementById("sne")?.classList.add("visible");
         }
 
         if (condition === "thunderstorm") {
+          console.log("Viser torden");
           document.getElementById("graasky")?.classList.add("visible");
           document.getElementById("storskygge")?.classList.add("visible");
           document.getElementById("lyn")?.classList.add("visible");
@@ -147,6 +152,7 @@ import Svg from "./svg.astro";
 
         // Tjek vindhastighed (over 10 m/s)
         if (data.wind && data.wind.speed > 10) {
+          console.log("Viser vind");
           document.getElementById("vind")?.classList.add("visible");
         }
       }
